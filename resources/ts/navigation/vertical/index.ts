@@ -9,4 +9,10 @@ export default [
     to: { name: 'second-page' },
     icon: { icon: 'tabler-file' },
   },
+
+    {
+    title: 'Users',
+    to: { name: 'users' },
+    icon: { icon: 'tabler-users' },
+  },
 ]

@@ -19,7 +19,8 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 ## Project Setup
 
 ```sh
-npm install
+export NODE_OPTIONS="--max-old-space-size=8192"   # 8 GB
+yarn install
 ```
 
 ### Compile and Hot-Reload for Development
@@ -33,3 +34,22 @@ npm run dev
 ```sh
 npm run build
 ```
+
+
+# 0) Make install layout consistent across dev + CI
+echo "node-linker=hoisted" >> .npmrc   # or delete the CLI flag and commit this
+
+# 1) Recompute lockfile ONLY (no node_modules written, no scripts)
+pnpm install --lockfile-only --ignore-scripts --no-optional
+
+# 2) Commit the updated lockfile
+git add pnpm-lock.yaml .npmrc
+git commit -m "chore: sync pnpm-lock.yaml with package.json"
+
+# 3) CI install (fast, reproducible, still skips heavy scripts)
+CI=1 NODE_OPTIONS="--max-old-space-size=4096" \
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
+PUPPETEER_SKIP_DOWNLOAD=1 \
+CYPRESS_INSTALL_BINARY=0 \
+ELECTRON_SKIP_BINARY_DOWNLOAD=1 \
+pnpm install --frozen-lockfile --ignore-scripts
